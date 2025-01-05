@@ -1,0 +1,7 @@
+flask
+flask-pymongo
+flask-jwt-extended
+redis
+kafka-python
+flask-injector
+injector

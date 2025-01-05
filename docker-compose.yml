@@ -1,0 +1,65 @@
+services:
+  auth_service:
+    build:
+      context: ./services/auth_service
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+    command: flask run --host=0.0.0.0 --port=5001 --reload  
+    environment:
+      - FLASK_ENV=development
+    depends_on:
+      - mongo
+      - redis
+      - kafka
+      - zookeeper
+
+  user_service:
+    build:
+      context: ./services/user_service
+      dockerfile: Dockerfile
+    volumes:
+      - ./services/user_service:/app
+    ports:
+      - "5002:5002"
+    command: flask run --host=0.0.0.0 --port=5002 --reload  
+    environment:
+      - FLASK_ENV=development
+    depends_on:
+      - mongo
+      - redis
+      - kafka
+      - zookeeper
+
+  mongo:
+    image: mongo:5.0
+    container_name: mongo
+    ports:
+      - "27017:27017"
+
+  redis:
+    image: redis:6.2
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+  kafka:
+    image: confluentinc/cp-kafka:7.3.0
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    depends_on:
+      - zookeeper
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.3.0
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
