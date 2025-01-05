@@ -1,8 +1,10 @@
 services:
-  auth_service:
+  auth-service:
     build:
-      context: ./services/auth_service
+      context: ./services/auth-service
       dockerfile: Dockerfile
+    volumes:
+      - ./services/auth-service:/app  
     ports:
       - "5001:5001"
     command: flask run --host=0.0.0.0 --port=5001 --reload  
@@ -14,12 +16,12 @@ services:
       - kafka
       - zookeeper
 
-  user_service:
+  user-service:
     build:
-      context: ./services/user_service
+      context: ./services/user-service
       dockerfile: Dockerfile
     volumes:
-      - ./services/user_service:/app
+      - ./services/user-service:/app
     ports:
       - "5002:5002"
     command: flask run --host=0.0.0.0 --port=5002 --reload  
@@ -63,3 +65,5 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
